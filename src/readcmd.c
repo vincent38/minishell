@@ -91,6 +91,11 @@ static char **split_in_words(char *line)
 			w = ">";
 			cur++;
 			break;
+		case '&':
+			// New case for &
+			w = "&";
+			cur++;
+			break;
 		case '|':
 			w = "|";
 			cur++;
@@ -107,6 +112,7 @@ static char **split_in_words(char *line)
 				case '<':
 				case '>':
 				case '|':
+				case '&':
 					c = 0;
 					break;
 				default: ;
@@ -189,10 +195,20 @@ struct cmdline *readcmd(void)
 	s->in = 0;
 	s->out = 0;
 	s->seq = 0;
+	s->bg = 0;
 
 	i = 0;
 	while ((w = words[i++]) != 0) {
 		switch (w[0]) {
+		case '&':
+			// We take & into consideration
+			// Only one accepted per command
+			if (s->bg) {
+				s->err = "already specified as a background process";
+				goto error;
+			}
+			s->bg = 1;
+			break;
 		case '<':
 			/* Tricky : the word can only be "<" */
 			if (s->in) {

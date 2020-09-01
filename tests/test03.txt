@@ -1,6 +1,0 @@
-#
-# test03.txt - Exécuter une succession de commandes sans argument
-#
-ls
-echo
-ls
